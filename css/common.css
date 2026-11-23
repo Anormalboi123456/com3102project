@@ -23,10 +23,24 @@ body {
     table-layout: fixed;
     width: 100%;
     margin: 0;
-    font-size: large;
+    font-size: 20px;
     font-weight: bolder;
     background-color: green;
+    border-width: 1;
+    border-color: black;
+    text-align: center;
 }
+.buttontable{
+    table-layout: fixed;
+    width: 100%;
+    margin: 0;
+    font-size: large;
+    font-weight: bolder;
+    border-width: 0;
+    border-color: green;
+    background-color: green;
+}
+
 
 .menutable td {
     text-align: center;
