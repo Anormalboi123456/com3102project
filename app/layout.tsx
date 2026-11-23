@@ -42,7 +42,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
 <table className="buttontable">
 <tbody>
 <tr>
-    <td><Link className="slide-in block w-full rounded bg-green-600 px-4 py-2 text-center text-white" href="/">Home</Link></td>
+    <td><Link className="slide-in block w-full rounded bg-green-600 px-4 py-2 text-center text-white" href="/Homepage">Home</Link></td>
     <td><Link className="slide-in block w-full rounded bg-green-600 px-4 py-2 text-center text-white" href="/About">About Us</Link></td>
     <td><Link className="slide-in block w-full rounded bg-green-600 px-4 py-2 text-center text-white" href="/About">Test</Link></td>
     <td><Link className="slide-in block w-full rounded bg-green-600 px-4 py-2 text-center text-white" href="/About">Test</Link></td>
