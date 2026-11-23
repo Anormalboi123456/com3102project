@@ -6,15 +6,24 @@ body {
     color: black;
 }
 
+.site-main {
+    flex: 1;
+    min-height: 0;
+}
+
 .login-page {
     box-sizing: border-box;
     width: 100%;
-    min-height: 100vh;
+}
+/*call bold if needed, for any text(yes i am lazy here >:) )*/
+.bold{
+    font-weight: Bold;
+    font-size: 20px;
 }
 
 .menuimage {
     display: block;
-    width: min(15%, 12rem);
+    width: 100%;
     height: auto;
     margin: 0 auto;
 }
@@ -25,10 +34,35 @@ body {
     margin: 0;
     font-size: 20px;
     font-weight: bolder;
-    background-color: green;
+    background-color: antiquewhite;
     border-width: 1;
     border-color: black;
     text-align: center;
+}
+.menutable td {
+    text-align: center;
+    padding: 0;
+}
+.menutable .login-cell {
+    padding-right: 1rem;
+    text-align: right;
+}
+.home-login-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.375rem;
+    background-color: #16a34a;
+    color: white;
+    font-size: 0.875rem;
+    text-decoration: none;
+}
+.home-login-icon {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+    flex-shrink: 0;
 }
 .buttontable{
     table-layout: fixed;
@@ -40,16 +74,29 @@ body {
     border-color: green;
     background-color: green;
 }
-
-
-.menutable td {
+.bottomtable{
+    table-layout: 1px;
+    width: 100%;
+    margin: 0;
+    font-size: 15px;
+    background-color: lightgreen;
     text-align: center;
-    padding: 0;
+    padding: 1rem;
 }
-
+.page-spacer {
+    min-height: 0vh;
+    /*Change if needed, for a gap*/
+}
 .login-input {
     background-color: #fff;
     color: #000;
+}
+
+.small-icon {
+    width: 30px;
+    height: 30px;
+    object-fit: contain;
+    flex-shrink: 0;
 }
 
 @keyframes slide-in-from-right {
