@@ -120,3 +120,203 @@ body {
         animation: none;
     }
 }
+
+/*  HOMEPAGE ONLY  */
+.home-wrap {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+.home-title {
+    font-size: 32px;
+    font-weight: bolder;
+    margin: 0.5rem 0 0.25rem 0;
+}
+
+.home-muted {
+    color: #444;
+    font-size: 15px;
+    margin: 0 0 1rem 0;
+}
+
+.home-note {
+    color: #444;
+    font-size: 14px;
+}
+
+.home-card {
+    box-sizing: border-box;
+    background-color: #fff;
+    border: 1px solid black;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.home-card h2 {
+    margin: 0 0 0.75rem 0;
+    font-size: 22px;
+}
+
+.home-card h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 19px;
+}
+
+.home-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    align-items: start;
+}
+
+.home-table {
+    table-layout: auto;
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 16px;
+    text-align: left;
+    background-color: #fff;
+}
+
+.home-table th {
+    background-color: green;
+    color: white;
+    padding: 0.6rem;
+    border: 1px solid black;
+}
+
+.home-table td {
+    padding: 0.6rem;
+    border: 1px solid black;
+    vertical-align: top;
+}
+
+.home-table tbody tr:nth-child(even) {
+    background-color: #f6f1e7;
+}
+
+.home-pill {
+    display: inline-block;
+    padding: 0.15rem 0.6rem;
+    border-radius: 999px;
+    background-color: lightgreen;
+    color: black;
+    font-size: 13px;
+    font-weight: bolder;
+    border: 1px solid green;
+}
+
+.home-activity {
+    border-bottom: 1px solid #ddd;
+    padding: 0.6rem 0;
+}
+
+.home-activity:last-child {
+    border-bottom: 0;
+}
+
+.home-calendar {
+    table-layout: fixed;
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+    font-size: 15px;
+    background-color: #fff;
+}
+
+.home-calendar th {
+    background-color: green;
+    color: white;
+    padding: 0.5rem 0;
+    border: 1px solid black;
+}
+
+.home-calendar td {
+    padding: 0.55rem 0;
+    border: 1px solid black;
+    height: 38px;
+}
+
+.home-cal-today {
+    background-color: #FFF3C4;
+    font-weight: bolder;
+    outline: 2px solid green;
+    outline-offset: -2px;
+}
+
+.home-cal-dot {
+    color: green;
+    font-weight: bolder;
+}
+
+.home-contact-info {
+    background-color: antiquewhite;
+    border: 1px solid black;
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    font-size: 15px;
+}
+
+.home-label {
+    display: block;
+    font-weight: bolder;
+    margin: 0.75rem 0 0.25rem 0;
+}
+
+.home-input,
+.home-textarea {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 0.6rem;
+    font-size: 16px;
+    background-color: #fff;
+    color: #000;
+    border: 1px solid black;
+    border-radius: 6px;
+}
+
+.home-textarea {
+    resize: vertical;
+    min-height: 90px;
+}
+
+.home-button {
+    display: inline-block;
+    margin-top: 0.9rem;
+    padding: 0.6rem 1.2rem;
+    font-size: 16px;
+    font-weight: bolder;
+    background-color: #16a34a;
+    color: white;
+    border: 0;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.home-button:hover {
+    background-color: green;
+}
+
+.home-ok {
+    background-color: lightgreen;
+    border: 1px solid green;
+    padding: 0.75rem;
+    font-weight: bolder;
+}
+
+@media (max-width: 700px) {
+    .home-grid {
+        grid-template-columns: 1fr;
+    }
+    .home-table {
+        font-size: 14px;
+    }
+    .home-title {
+        font-size: 26px;
+    }
+}
+/* End of Homepage */
