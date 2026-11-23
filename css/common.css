@@ -1,0 +1,61 @@
+html,
+body {
+    width: 100%;
+    margin: 0;
+    background-color:antiquewhite;
+    color: black;
+}
+
+.login-page {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 100vh;
+}
+
+.menuimage {
+    display: block;
+    width: min(15%, 12rem);
+    height: auto;
+    margin: 0 auto;
+}
+
+.menutable {
+    table-layout: fixed;
+    width: 100%;
+    margin: 0;
+    font-size: large;
+    font-weight: bolder;
+    background-color: green;
+}
+
+.menutable td {
+    text-align: center;
+    padding: 0;
+}
+
+.login-input {
+    background-color: #fff;
+    color: #000;
+}
+
+@keyframes slide-in-from-right {
+    from {
+        opacity: 0;
+        transform: translateX(1.5rem);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.slide-in {
+    animation: slide-in-from-right 500ms ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .slide-in {
+        animation: none;
+    }
+}
