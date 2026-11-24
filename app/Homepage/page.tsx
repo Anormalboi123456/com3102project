@@ -1,9 +1,6 @@
 "use client";
 import { useState } from "react";
 
-// Homepage only: Latest table + Activities + Calendar + Contact Us
-// NO login here (login is in another file), NO SQL, demo data inside this file
-
 type LatestItem = { date: string; title: string; type: string; module: string };
 const LATEST: LatestItem[] = [
   { date: "2026-12-10", title: "COM3102 Project Demo", type: "Assignment", module: "COM3102" },
