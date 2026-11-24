@@ -64,6 +64,9 @@ export default function Login() {
         >
             Forgot password?
         </button>
+        <Link className="rounded bg-blue-600 px-4 py-2 text-white" href='../Register'>
+            Register
+        </Link>
     </div>
     <p aria-live="polite" role="status">{message}</p>
     </form>

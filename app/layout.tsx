@@ -44,7 +44,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
 <tr>
     <td><Link className="slide-in block w-full rounded bg-green-600 px-4 py-2 text-center text-white" href="/Homepage">Home</Link></td>
     <td><Link className="slide-in block w-full rounded bg-green-600 px-4 py-2 text-center text-white" href="/About">About Us</Link></td>
-    <td><Link className="slide-in block w-full rounded bg-green-600 px-4 py-2 text-center text-white" href="/About">Test</Link></td>
+    <td><Link className="slide-in block w-full rounded bg-green-600 px-4 py-2 text-center text-white" href="/Students">Database test</Link></td>
     <td><Link className="slide-in block w-full rounded bg-green-600 px-4 py-2 text-center text-white" href="/About">Test</Link></td>
     <td><Link className="slide-in block w-full rounded bg-green-600 px-4 py-2 text-center text-white" href="/About">Test</Link></td>
 </tr>
