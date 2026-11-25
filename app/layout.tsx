@@ -3,7 +3,10 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import "../css/common.css";
 import { cookies } from "next/headers";
+import Image from "next/image";
+import Link from "next/link";
 import AuthProvider from "@/components/AuthProvider";
+import LogoutButton from "@/components/LogoutButton";
 import { SESSION_COOKIE_NAME, verifySessionToken } from "@/lib/session";
 
 const geistSans = Geist({
@@ -41,6 +44,100 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
           username={session?.username ?? null}
           isHsuStaff={session?.isHsuStaff ?? false}
         >
+          <div className="login-page">
+            <table className="menutable">
+              <tbody>
+                <tr>
+                  <td>
+                    <Image
+                      src="/resources/HSU_logo_2.png"
+                      className="menuimage slide-in"
+                      alt="HSU logo"
+                      width={3244}
+                      height={816}
+                    />
+                  </td>
+                  <td colSpan={2}>
+                    <h1 className="slide-in">Welcome to Hang Sheng University App!</h1>
+                  </td>
+                  <td className="login-cell">
+                    {session ? (
+                      <span className="home-login-link slide-in">
+                        <Image
+                          src="/resources/user_icon.png"
+                          className="home-login-icon"
+                          alt=""
+                          width={512}
+                          height={512}
+                        />
+                        {session.username}
+                        <LogoutButton />
+                      </span>
+                    ) : (
+                      <Link className="home-login-link slide-in" href="/Login">
+                        <Image
+                          src="/resources/user_icon.png"
+                          className="home-login-icon"
+                          alt=""
+                          width={512}
+                          height={512}
+                        />
+                        Log in
+                      </Link>
+                    )}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            <table className="buttontable">
+              <tbody>
+                <tr>
+                  <td>
+                    <Link
+                      className="slide-in block w-full rounded bg-green-600 px-4 py-2 text-center text-white"
+                      href="/Homepage"
+                    >
+                      Home
+                    </Link>
+                  </td>
+                  <td>
+                    <Link
+                      className="slide-in block w-full rounded bg-green-600 px-4 py-2 text-center text-white"
+                      href="/About"
+                    >
+                      About Us
+                    </Link>
+                  </td>
+                  <td>
+                    <Link
+                      className="slide-in block w-full rounded bg-green-600 px-2 py-1 text-center text-sm text-white"
+                      href="/Students"
+                    >
+                      Database
+                    </Link>
+                  </td>
+                  <td>
+                    <Link
+                      className="slide-in block w-full rounded bg-green-600 px-4 py-2 text-center text-white"
+                      href="/About"
+                    >
+                      Test
+                    </Link>
+                  </td>
+                  <td>
+                    <Link
+                      className="slide-in block w-full rounded bg-green-600 px-4 py-2 text-center text-white"
+                      href="/About"
+                    >
+                      Test
+                    </Link>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div className="page-spacer" aria-hidden="true" />
+          </div>
           <main className="site-main">{children}</main>
         </AuthProvider>
         <footer className="bottomtable">

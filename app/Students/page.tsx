@@ -33,7 +33,7 @@ export default async function StudentsPage() {
       <p className="mb-6 text-gray-600">
         Registered accounts fetched from the PHP API.
       </p>
-
+      {/*isHsuStaff, check the user is staff from the value passed from getUserAccount(should get is student/is staff) */}
       {!session ? (
         <p className="rounded border border-amber-300 bg-amber-50 p-4 text-amber-900" role="alert">
           Log in to view user accounts.

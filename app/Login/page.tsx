@@ -46,6 +46,18 @@ export default function Login() {
     }
 
     if (!response.ok) {
+      if (response.status === 502) {
+        const result: unknown = await response.json().catch(() => null)
+        const errorMessage =
+          typeof result === "object" &&
+          result !== null &&
+          "error" in result &&
+          typeof result.error === "string"
+            ? result.error
+            : "Login service is unavailable. Please try again."
+        setMessage(errorMessage)
+        return
+      }
       setMessage(`Login failed (HTTP ${response.status}). Please try again.`)
       return
     }

@@ -27,6 +27,16 @@ function isLoginRequest(value: unknown): value is LoginRequest {
   );
 }
 
+function getStaffStatus(value: object): boolean | null {
+  const result = value as Record<string, unknown>;
+  const status = result.isHsuStaff ?? result.is_hsu_staff;
+
+  if (typeof status === "boolean") return status;
+  if (status === 1 || status === "1") return true;
+  if (status === 0 || status === "0") return false;
+  return null;
+}
+
 export async function POST(request: Request) {
   let payload: unknown;
   try {
@@ -80,12 +90,16 @@ export async function POST(request: Request) {
         return Response.json({ error: "Login service is unavailable." }, { status: 502 });
       }
 
-      const isHsuStaff =
-        "isHsuStaff" in loginResult && typeof loginResult.isHsuStaff === "boolean"
-          ? loginResult.isHsuStaff
-          : false;
-      if (isHsuStaff === false && !("isHsuStaff" in loginResult)) {
-        console.warn("PHP login API omitted staff status; granting a non-staff session.");
+      const isHsuStaff = getStaffStatus(loginResult);
+      if (isHsuStaff === null) {
+        console.error("PHP login API omitted or returned an invalid staff status.");
+        return Response.json(
+          {
+            error:
+              "The PHP login endpoint is outdated or missing the staff status. Copy the latest php-api/login.php into XAMPP and try again.",
+          },
+          { status: 502 },
+        );
       }
 
       try {
