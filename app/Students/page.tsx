@@ -28,8 +28,8 @@ export default async function StudentsPage() {
 
       {databaseError ? (
         <p className="rounded border border-red-300 bg-red-50 p-4 text-red-800" role="alert">
-          Could not load student records. Check that XAMPP MySQL is running and
-          the database settings in <code>.env.local</code> are correct.
+          Could not load student records. Check that XAMPP Apache and MySQL are
+          running and that the PHP endpoint is configured correctly.
         </p>
       ) : (
         <div className="overflow-x-auto rounded border border-gray-200">

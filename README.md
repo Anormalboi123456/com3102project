@@ -2,9 +2,9 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Student records with XAMPP
 
-The student list uses MariaDB/MySQL from XAMPP. The database connection runs on the Next.js server; database credentials must stay in `.env.local` and must not use a `NEXT_PUBLIC_` prefix.
+The student list is served by a PHP API that connects to MariaDB/MySQL from XAMPP. The Next.js server fetches the PHP API and renders the list; database credentials stay in Apache's server environment.
 
-1. In the XAMPP Control Panel, start **MySQL**. Start **Apache** as well if you want to use phpMyAdmin.
+1. In the XAMPP Control Panel, start **MySQL** and **Apache**.
 2. In phpMyAdmin, import [`database/student_records.sql`](./database/student_records.sql). This creates the `hsu_student_app` database and its `students` table.
 3. In phpMyAdmin's SQL tab, create a local read-only user. Replace the example password with your own:
 
@@ -13,27 +13,41 @@ The student list uses MariaDB/MySQL from XAMPP. The database connection runs on 
    GRANT SELECT ON hsu_student_app.students TO 'hsu_app'@'127.0.0.1';
    ```
 
-4. Create `.env.local` in the project root:
+4. Copy [`php-api/students.php`](./php-api/students.php) to a directory served by XAMPP Apache, for example:
 
-   ```dotenv
-   DB_HOST=127.0.0.1
-   DB_PORT=3306
-   DB_USER=hsu_app
-   DB_PASSWORD=replace-with-the-same-password
-   DB_NAME=hsu_student_app
-   STUDENTS_API_TOKEN=replace-with-a-long-random-token
+   ```text
+   /Applications/XAMPP/xamppfiles/htdocs/com3102project-api/students.php
    ```
 
-   Keep this file private; it is ignored by Git. The `STUDENTS_API_TOKEN` is for the JSON/XML API, not student login. You can generate a random value in Terminal with `openssl rand -hex 32`.
+   The PHP installation used by XAMPP must have the PDO MySQL extension enabled.
+5. In XAMPP Control Panel, open **Apache > Config > httpd.conf** and add these `SetEnv` directives to its server configuration, using your own database password and the same API token you will configure for Next.js:
 
-5. Add records using phpMyAdmin's **Insert** tab for the `students` table. Leave `last_login` empty if the student has never logged in, and leave `registered_at` empty to use its automatic timestamp.
-6. Run `npm run dev`, then open [http://localhost:3000/Students](http://localhost:3000/Students).
+   ```apache
+   SetEnv DB_HOST "127.0.0.1"
+   SetEnv DB_PORT "3306"
+   SetEnv DB_USER "hsu_app"
+   SetEnv DB_PASSWORD "replace-with-the-same-password"
+   SetEnv DB_NAME "hsu_student_app"
+   SetEnv STUDENTS_API_TOKEN "replace-with-a-long-random-token"
+   ```
 
-The page is read-only. The existing login and registration pages are still mock forms; they do not create accounts or update `last_login`. Do not expose this student list publicly until real authentication and authorization have been added.
+   Restart Apache after changing its configuration. Keep these values private and out of source control. The `STUDENTS_API_TOKEN` protects the JSON/XML API; it is not student login.
+6. Add the PHP endpoint URL and the matching API token to `.env.local` in the project root:
 
-To access the app from another computer, both the Next.js server and database must be reachable from it. For a public deployment, use a hosted database and configure the same environment variables in the hosting provider; do not expose XAMPP's database port directly to the internet.
+   ```dotenv
+   PHP_STUDENTS_API_URL=http://localhost/com3102project-api/students.php
+   STUDENTS_API_TOKEN=replace-with-the-same-token-configured-in-Apache
+   ```
 
-## Useful commands for mySQLadmin terminal(SQL page)
+   Do not use a `NEXT_PUBLIC_` prefix for the token. The Next.js server sends it to the PHP endpoint; it is not exposed to the browser. The previous `DB_*` values are no longer used by Next.js.
+
+7. Add records using phpMyAdmin's **Insert** tab for the `students` table. Leave `last_login` empty if the student has never logged in, and leave `registered_at` empty to use its automatic timestamp.
+8. Run `npm run dev`, then open [http://localhost:3000/Students](http://localhost:3000/Students).
+
+The page is read-only. The existing login and registration pages are still mock forms; they do not create accounts or update `last_login`. The API token protects server-to-server access but does not authenticate website visitors, so do not expose this student list publicly until user authentication and authorization have been added.
+
+To access the app from another computer, the Next.js server must be able to reach the PHP API, and PHP/Apache must be able to reach the database. For a public deployment, host the PHP API and database securely; do not expose XAMPP's database port directly to the internet.
+
 ## List the users in the data base
 SELECT User, Host FROM mysql.user WHERE User = 'hsu_app';
 ## Change password

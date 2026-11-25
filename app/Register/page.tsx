@@ -7,21 +7,18 @@ import "../../css/common.css"
 export default function Register() {
   const [message, setMessage] = useState("")
   const [isHsuStudent, setIsHsuStudent] = useState<"yes" | "no" | "">("")
-  const formData = new FormData(event.currentTarget)
-  const username = String(formData.get("username") ?? "").trim()
-  const password = String(formData.get("password") ?? "")
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-
     const formData = new FormData(event.currentTarget)
     const username = String(formData.get("username") ?? "").trim()
+    const password = String(formData.get("password") ?? "")
 
     if (!username) {
       setMessage("Enter your username.")
       return
     }
-
+    {/*Temporay*/}
     setMessage(`Registration form received for ${username}`)
   }
 
@@ -44,6 +41,16 @@ export default function Register() {
             autoComplete="username"
             required
           />
+        </label>
+        <label className="flex flex-col gap-1">
+          <span>Password:</span>
+          <input
+            className="login-input slide-in"
+            name="password"
+            type="text"
+            autoComplete="password"
+            required
+            />
         </label>
 
         <fieldset className="flex flex-col gap-2">
@@ -103,7 +110,6 @@ export default function Register() {
             </label>
           </>
         )}
-
         <label className="flex flex-col gap-1">
           <span>How did you hear about this application?</span>
           <input
@@ -117,7 +123,7 @@ export default function Register() {
           <button className="rounded bg-blue-600 px-4 py-2 text-white" type="submit">
             Register
           </button>
-          <button className="rounded border border-gray-500 px-4 py-2" type="reset">
+          <button className="rounded border border-blue-500 px-4 py-2" type="reset">
             Reset
           </button>
           <Link className="rounded bg-blue-600 px-4 py-2 text-white" href="/Login">

@@ -1,5 +1,3 @@
-import mysql, { type Pool, type RowDataPacket } from "mysql2/promise";
-
 export type Student = {
   student_name: string;
   student_id: string;
@@ -8,46 +6,48 @@ export type Student = {
   registered_at: string;
 };
 
-interface StudentRow extends RowDataPacket, Student {}
-
-let pool: Pool | undefined;
-
-function requiredEnvironmentVariable(name: string): string {
-  const value = process.env[name];
-  if (!value) {
-    throw new Error(`${name} is not configured. Add it to .env.local.`);
-  }
-  return value;
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
 }
 
-function getPool(): Pool {
-  if (pool) return pool;
+function isStudent(value: unknown): value is Student {
+  if (!isRecord(value)) return false;
 
-  const port = Number(process.env.DB_PORT ?? "3306");
-  if (!Number.isInteger(port) || port < 1 || port > 65535) {
-    throw new Error("DB_PORT must be a valid TCP port number.");
-  }
-
-  pool = mysql.createPool({
-    host: requiredEnvironmentVariable("DB_HOST"),
-    port,
-    user: requiredEnvironmentVariable("DB_USER"),
-    password: process.env.DB_PASSWORD ?? "",
-    database: requiredEnvironmentVariable("DB_NAME"),
-    connectionLimit: 10,
-    waitForConnections: true,
-    dateStrings: true,
-  });
-
-  return pool;
+  return (
+    typeof value.student_name === "string" &&
+    typeof value.student_id === "string" &&
+    typeof value.programme === "string" &&
+    (typeof value.last_login === "string" || value.last_login === null) &&
+    typeof value.registered_at === "string"
+  );
 }
 
 export async function getStudents(): Promise<Student[]> {
-  const [rows] = await getPool().execute<StudentRow[]>(
-    `SELECT student_name, student_id, programme, last_login, registered_at
-     FROM students
-     ORDER BY registered_at DESC, student_id ASC`,
-  );
+  const apiUrl = process.env.PHP_STUDENTS_API_URL;
+  const apiToken = process.env.STUDENTS_API_TOKEN;
+  if (!apiUrl || !apiToken) {
+    throw new Error(
+      "PHP_STUDENTS_API_URL and STUDENTS_API_TOKEN must be configured in .env.local.",
+    );
+  }
 
-  return rows;
+  const response = await fetch(apiUrl, {
+    headers: { Authorization: `Bearer ${apiToken}` },
+    cache: "no-store",
+  });
+  if (!response.ok) {
+    throw new Error(`PHP student API returned HTTP ${response.status}.`);
+  }
+
+  const payload: unknown = await response.json();
+  if (
+    !isRecord(payload) ||
+    payload.success !== true ||
+    !Array.isArray(payload.students) ||
+    !payload.students.every(isStudent)
+  ) {
+    throw new Error("PHP student API returned an invalid response.");
+  }
+
+  return payload.students;
 }
