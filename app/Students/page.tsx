@@ -10,23 +10,23 @@ export default async function StudentsPage() {
   await connection();
 
   let students: Student[] = [];
-  let databaseError = false;
+  let apiError = false;
 
   try {
     students = await getStudents();
   } catch (error) {
     console.error("Failed to render the students page:", error);
-    databaseError = true;
+    apiError = true;
   }
 
   return (
     <div className="mx-auto w-full max-w-6xl px-6 py-10">
       <h1 className="mb-2 text-3xl font-bold">Students</h1>
       <p className="mb-6 text-gray-600">
-        Student records stored in the local MariaDB database.
+        Student records fetched from the PHP API.
       </p>
 
-      {databaseError ? (
+      {apiError ? (
         <p className="rounded border border-red-300 bg-red-50 p-4 text-red-800" role="alert">
           Could not load student records. Check that XAMPP Apache and MySQL are
           running and that the PHP endpoint is configured correctly.

@@ -35,10 +35,21 @@ export default function Register() {
       return
     }
 
+    if (new TextEncoder().encode(password).length > 72) {
+      setMessage("Password must be 72 bytes or fewer.")
+      return
+    }
+
+    const studentStatus = formData.get("isHsuStudent")
+    if (studentStatus !== "yes" && studentStatus !== "no") {
+      setMessage("Choose whether you are a HSU student.")
+      return
+    }
+
     const payload = {
       username,
       password,
-      isHsuStudent: formData.get("isHsuStudent") === "yes",
+      isHsuStudent: studentStatus === "yes",
       studentId: String(formData.get("student_id") ?? "") || null,
       entranceYear: String(formData.get("entrance_year") ?? "") || null,
       programme: String(formData.get("programme") ?? "") || null,
@@ -54,6 +65,14 @@ export default function Register() {
       })
 
       if (!response.ok) {
+        if (response.status === 409) {
+          setMessage("That username is already registered. Choose another username.")
+          return
+        }
+        if (response.status === 400) {
+          setMessage("Check your registration details and try again.")
+          return
+        }
         setMessage(`Registration failed (HTTP ${response.status}). Please contact HSU Registry.`)
         return
       }
@@ -105,6 +124,7 @@ export default function Register() {
                 name="isHsuStudent"
                 type="radio"
                 value="yes"
+                required
                 checked={isHsuStudent === "yes"}
                 onChange={() => setIsHsuStudent("yes")}
               />

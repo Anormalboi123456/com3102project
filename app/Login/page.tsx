@@ -37,7 +37,7 @@ export default function Login() {
       return
     }
 
-    setMessage("Login successful.")
+    setMessage("Credentials verified. This demo does not keep you signed in.")
   } catch {
     setMessage("Could not connect to the login service. Please try again.")
   }

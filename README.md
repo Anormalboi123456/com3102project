@@ -5,21 +5,33 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 The student list is served by a PHP API that connects to MariaDB/MySQL from XAMPP. The Next.js server fetches the PHP API and renders the list; database credentials stay in Apache's server environment.
 
 1. In the XAMPP Control Panel, start **MySQL** and **Apache**.
-2. In phpMyAdmin, import [`database/student_records.sql`](./database/student_records.sql). This creates the `hsu_student_app` database and its `students` table.
-3. In phpMyAdmin's SQL tab, create a local read-only user. Replace the example password with your own:
+2. In phpMyAdmin, import [`database/student_records.sql`](./database/student_records.sql). This creates the `hsu_student_app` database and its `students` and `user_accounts` tables.
+3. In phpMyAdmin's SQL tab, create a local read-only user. an example has been provided:
 
    ```sql
-   CREATE USER 'hsu_app'@'127.0.0.1' IDENTIFIED BY 'replace-with-your-own-password';
-   GRANT SELECT ON hsu_student_app.students TO 'hsu_app'@'127.0.0.1';
+   CREATE USER 'hsu_admin'@'127.0.0.1' IDENTIFIED BY 'admin123';
+   GRANT SELECT ON hsu_student_app.students TO 'hsu_admin'@'127.0.0.1';
    ```
+Some notes:
+## Find the users in the data base
+SELECT User, Host FROM mysql.user WHERE User = '(user)';
+## Change password
+ALTER USER '(name)'@'127.0.0.1' IDENTIFIED BY '(password)';
+## Grant user premission
+GRANT SELECT ON hsu_student_app.students TO 'hsu_app'@'127.0.0.1';
+GRANT SELECT, INSERT ON hsu_student_app.user_accounts TO 'hsu_app'@'127.0.0.1';
+## Add student(register)
+INSERT INTO hsu_student_app.students (student_id, student_name, programme)
+VALUES ('stu-num', 'stu-name', 'program');
 
-4. Copy [`php-api/students.php`](./php-api/students.php) to a directory served by XAMPP Apache, for example:
+
+4. Copy [`php-api/students.php`](./php-api/students.php), [`php-api/login.php`](./php-api/login.php), and [`php-api/register.php`](./php-api/register.php) to a directory served by XAMPP Apache, for example:
 
    ```text
    /Applications/XAMPP/xamppfiles/htdocs/com3102project-api/students.php
    ```
 
-   The PHP installation used by XAMPP must have the PDO MySQL extension enabled.
+   The PHP installation used by XAMPP must have the PDO MySQL extension enabled. The database user must be allowed to select from `user_accounts` for login and insert into it for registration.
 5. In XAMPP Control Panel, open **Apache > Config > httpd.conf** and add these `SetEnv` directives to its server configuration, using your own database password and the same API token you will configure for Next.js:
 
    ```apache
@@ -28,55 +40,27 @@ The student list is served by a PHP API that connects to MariaDB/MySQL from XAMP
    SetEnv DB_USER "hsu_app"
    SetEnv DB_PASSWORD "replace-with-the-same-password"
    SetEnv DB_NAME "hsu_student_app"
-   SetEnv STUDENTS_API_TOKEN "replace-with-a-long-random-token"
+   SetEnv STUDENTS_API_TOKEN "123456"
    ```
 
-   Restart Apache after changing its configuration. Keep these values private and out of source control. The `STUDENTS_API_TOKEN` protects the JSON/XML API; it is not student login.
+   Restart Apache after changing its configuration. Keep these values private and out of source control.    The `STUDENTS_API_TOKEN` protects the PHP endpoints; it is not student login.
 6. Add the PHP endpoint URL and the matching API token to `.env.local` in the project root:
+## 123456 is a test example, change to anything else later:
 
    ```dotenv
    PHP_STUDENTS_API_URL=http://localhost/com3102project-api/students.php
-   STUDENTS_API_TOKEN=replace-with-the-same-token-configured-in-Apache
+   PHP_LOGIN_API_URL=http://localhost/com3102project-api/login.php
+   PHP_REGISTER_API_URL=http://localhost/com3102project-api/register.php
+   STUDENTS_API_TOKEN=123456
    ```
 
-   Do not use a `NEXT_PUBLIC_` prefix for the token. The Next.js server sends it to the PHP endpoint; it is not exposed to the browser. The previous `DB_*` values are no longer used by Next.js.
-
 7. Add records using phpMyAdmin's **Insert** tab for the `students` table. Leave `last_login` empty if the student has never logged in, and leave `registered_at` empty to use its automatic timestamp.
-8. Run `npm run dev`, then open [http://localhost:3000/Students](http://localhost:3000/Students).
+8. Run `npm run dev`, then open [http://localhost:3000/Students](http://localhost:3000/Students) or register at [http://localhost:3000/Register](http://localhost:3000/Register).
 
-The page is read-only. The existing login and registration pages are still mock forms; they do not create accounts or update `last_login`. The API token protects server-to-server access but does not authenticate website visitors, so do not expose this student list publicly until user authentication and authorization have been added.
+The student list is read-only. Registration inserts accounts into `user_accounts` and stores password hashes rather than plain-text passwords. For non-student accounts, student ID, entrance year, and programme are stored as `NULL`; "How did you hear about this application?" is optional. Login checks the saved password hash. The API token protects server-to-server access but does not authenticate website visitors, so do not expose the student list publicly until user authentication and authorization have been added.
 
 To access the app from another computer, the Next.js server must be able to reach the PHP API, and PHP/Apache must be able to reach the database. For a public deployment, host the PHP API and database securely; do not expose XAMPP's database port directly to the internet.
 
-## List the users in the data base
-SELECT User, Host FROM mysql.user WHERE User = 'hsu_app';
-## Change password
-ALTER USER '(name)'@'127.0.0.1' IDENTIFIED BY '(password)';
-## Grant user premission
-GRANT SELECT ON hsu_student_app.students TO 'hsu_app'@'127.0.0.1';
-## Add student(register)
-INSERT INTO hsu_student_app.students (student_id, student_name, programme)
-VALUES ('stu-num', 'stu-name', 'program');
-
-## Getting Started
-
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
 ## Learn More
 
