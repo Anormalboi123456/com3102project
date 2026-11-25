@@ -51,8 +51,17 @@ $username = is_array($payload) && isset($payload['username']) && is_string($payl
 $password = is_array($payload) && isset($payload['password']) && is_string($payload['password'])
     ? $payload['password']
     : '';
+$staffNumber = is_array($payload) && isset($payload['staffNumber']) && is_string($payload['staffNumber'])
+    ? trim($payload['staffNumber'])
+    : '';
 
-if ($username === '' || strlen($username) > 80 || $password === '' || strlen($password) > 4096) {
+if (
+    $username === ''
+    || strlen($username) > 80
+    || $password === ''
+    || strlen($password) > 4096
+    || strlen($staffNumber) > 32
+) {
     respondJson(400, ['error' => 'Username and password are required.']);
     exit;
 }
@@ -83,7 +92,8 @@ try {
         ]
     );
     $statement = $pdo->prepare(
-        'SELECT password_hash FROM user_accounts WHERE username = :username LIMIT 1'
+        'SELECT password_hash, is_hsu_staff, staff_number
+         FROM user_accounts WHERE username = :username LIMIT 1'
     );
     $statement->execute(['username' => $username]);
     $account = $statement->fetch();
@@ -102,4 +112,22 @@ if (!$account || !password_verify($password, $account['password_hash'])) {
     exit;
 }
 
-respondJson(200, ['success' => true]);
+if ((bool) $account['is_hsu_staff'] && trim((string) $account['staff_number']) === '') {
+    respondJson(403, ['error' => 'Staff account is missing its staff number. Contact the administrator.']);
+    exit;
+}
+
+if ((bool) $account['is_hsu_staff'] && $staffNumber === '') {
+    respondJson(422, ['error' => 'Staff number is required for HSU staff login.']);
+    exit;
+}
+
+if ((bool) $account['is_hsu_staff'] && !hash_equals((string) $account['staff_number'], $staffNumber)) {
+    respondJson(401, ['error' => 'Incorrect username, password, or staff number.']);
+    exit;
+}
+
+respondJson(200, [
+    'success' => true,
+    'isHsuStaff' => (bool) $account['is_hsu_staff'],
+]);

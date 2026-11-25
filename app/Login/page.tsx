@@ -1,10 +1,12 @@
 "use client"
+import { useRouter } from "next/navigation"
 import { useState, type FormEvent } from "react"
 import '../../css/common.css'
 import Link from "next/link"
 
 export default function Login() {
     const [message, setMessage] = useState("")
+    const router = useRouter()
 
    async function handleSubmit(event: FormEvent<HTMLFormElement>) {
   event.preventDefault()
@@ -12,6 +14,7 @@ export default function Login() {
   const formData = new FormData(event.currentTarget)
   const username = String(formData.get("username") ?? "").trim()
   const password = String(formData.get("password") ?? "")
+  const staffNumber = String(formData.get("staff_number") ?? "").trim()
 
   if (!username || !password) {
     setMessage("Please enter your username and password.")
@@ -24,11 +27,21 @@ export default function Login() {
     const response = await fetch("/api/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password }),
+      body: JSON.stringify({ username, password, staffNumber: staffNumber || null }),
     })
 
     if (response.status === 401) {
       setMessage("Incorrect username or password.")
+      return
+    }
+
+    if (response.status === 422) {
+      setMessage("Enter the staff number registered with this staff account.")
+      return
+    }
+
+    if (response.status === 403) {
+      setMessage("This staff account is missing its staff number. Contact the administrator.")
       return
     }
 
@@ -37,7 +50,8 @@ export default function Login() {
       return
     }
 
-    setMessage("Credentials verified. This demo does not keep you signed in.")
+    router.replace("/Homepage")
+    router.refresh()
   } catch {
     setMessage("Could not connect to the login service. Please try again.")
   }
@@ -69,6 +83,15 @@ export default function Login() {
             type="password"
             autoComplete="current-password"
             required
+        />
+    </label>
+    <label className="flex flex-col gap-1">
+        <span>Staff number (HSU staff only)</span>
+        <input
+            className="login-input slide-in"
+            name="staff_number"
+            type="text"
+            autoComplete="off"
         />
     </label>
     <div className="flex flex-wrap gap-2">

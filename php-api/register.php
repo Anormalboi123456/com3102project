@@ -84,6 +84,7 @@ $password = isset($payload['password']) && is_string($payload['password'])
     ? $payload['password']
     : '';
 $isHsuStudent = $payload['isHsuStudent'] ?? null;
+$isHsuStaff = $payload['isHsuStaff'] ?? null;
 
 if (
     $username === ''
@@ -91,17 +92,25 @@ if (
     || $password === ''
     || strlen($password) > 72
     || !is_bool($isHsuStudent)
+    || !is_bool($isHsuStaff)
 ) {
-    respondJson(400, ['error' => 'Invalid username, password, or student status.']);
+    respondJson(400, ['error' => 'Invalid username, password, or account status.']);
     exit;
 }
 
 $studentId = optionalText($payload, 'studentId', 32);
 $entranceYear = optionalText($payload, 'entranceYear', 5);
 $programme = optionalText($payload, 'programme', 80);
+$staffNumber = optionalText($payload, 'staffNumber', 32);
 $heardAbout = optionalText($payload, 'heardAbout', 255);
 
-if ($studentId === false || $entranceYear === false || $programme === false || $heardAbout === false) {
+if (
+    $studentId === false
+    || $entranceYear === false
+    || $programme === false
+    || $staffNumber === false
+    || $heardAbout === false
+) {
     respondJson(400, ['error' => 'One or more registration fields are invalid.']);
     exit;
 }
@@ -109,6 +118,7 @@ if ($studentId === false || $entranceYear === false || $programme === false || $
 if ($isHsuStudent) {
     if (
         $studentId === null
+        || !preg_match('/^S\d{6}$/i', $studentId)
         || $entranceYear === null
         || !preg_match('/^\d{1,5}$/', $entranceYear)
         || (int) $entranceYear > 65535
@@ -117,10 +127,19 @@ if ($isHsuStudent) {
         respondJson(400, ['error' => 'Student ID, entrance year, and programme are required for students.']);
         exit;
     }
+    $studentId = strtoupper($studentId);
 } else {
     $studentId = null;
     $entranceYear = null;
     $programme = null;
+}
+
+if ($isHsuStaff && $staffNumber === null) {
+    respondJson(400, ['error' => 'Staff number is required for HSU staff.']);
+    exit;
+}
+if (!$isHsuStaff) {
+    $staffNumber = null;
 }
 
 try {
@@ -150,17 +169,21 @@ try {
     );
     $statement = $pdo->prepare(
         'INSERT INTO user_accounts
-            (username, password_hash, is_hsu_student, student_id, entrance_year, programme, heard_about)
+            (username, password_hash, is_hsu_student, is_hsu_staff, student_id, entrance_year,
+             programme, staff_number, heard_about)
          VALUES
-            (:username, :password_hash, :is_hsu_student, :student_id, :entrance_year, :programme, :heard_about)'
+            (:username, :password_hash, :is_hsu_student, :is_hsu_staff, :student_id, :entrance_year,
+             :programme, :staff_number, :heard_about)'
     );
     $statement->execute([
         'username' => $username,
         'password_hash' => password_hash($password, PASSWORD_DEFAULT),
         'is_hsu_student' => $isHsuStudent ? 1 : 0,
+        'is_hsu_staff' => $isHsuStaff ? 1 : 0,
         'student_id' => $studentId,
         'entrance_year' => $entranceYear === null ? null : (int) $entranceYear,
         'programme' => $programme,
+        'staff_number' => $staffNumber,
         'heard_about' => $heardAbout,
     ]);
 } catch (PDOException $error) {

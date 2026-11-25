@@ -2,9 +2,11 @@ type RegisterRequest = {
   username: string;
   password: string;
   isHsuStudent: boolean;
+  isHsuStaff: boolean;
   studentId: string | null;
   entranceYear: string | null;
   programme: string | null;
+  staffNumber: string | null;
   heardAbout: string | null;
 };
 
@@ -27,25 +29,30 @@ function isRegisterRequest(value: unknown): value is RegisterRequest {
     value.password.length === 0 ||
     new TextEncoder().encode(value.password).length > 72 ||
     typeof value.isHsuStudent !== "boolean" ||
+    typeof value.isHsuStaff !== "boolean" ||
     !isNullableString(value.studentId, 32) ||
-    !isNullableString(value.entranceYear, 4) ||
+    !isNullableString(value.entranceYear, 5) ||
     !isNullableString(value.programme, 80) ||
+    !isNullableString(value.staffNumber, 32) ||
     !isNullableString(value.heardAbout, 255)
   ) {
     return false;
   }
 
-  if (!value.isHsuStudent) return true;
+  const validStudentDetails =
+    !value.isHsuStudent ||
+    (typeof value.studentId === "string" &&
+      /^S\d{6}$/i.test(value.studentId.trim()) &&
+      typeof value.entranceYear === "string" &&
+      /^\d{1,5}$/.test(value.entranceYear) &&
+      Number(value.entranceYear) <= 65535 &&
+      typeof value.programme === "string" &&
+      value.programme.trim().length > 0);
+  const validStaffDetails =
+    !value.isHsuStaff ||
+    (typeof value.staffNumber === "string" && value.staffNumber.trim().length > 0);
 
-  return (
-    typeof value.studentId === "string" &&
-    value.studentId.trim().length > 0 &&
-    typeof value.entranceYear === "string" &&
-    /^\d{1,5}$/.test(value.entranceYear) &&
-    Number(value.entranceYear) <= 65535 &&
-    typeof value.programme === "string" &&
-    value.programme.trim().length > 0
-  );
+  return validStudentDetails && validStaffDetails;
 }
 
 export async function POST(request: Request) {
@@ -58,7 +65,7 @@ export async function POST(request: Request) {
 
   if (!isRegisterRequest(payload)) {
     return Response.json(
-      { error: "Enter a username and password, and complete the required student fields." },
+      { error: "Complete the required account, student, and staff fields." },
       { status: 400 },
     );
   }
@@ -81,9 +88,11 @@ export async function POST(request: Request) {
         username: payload.username.trim(),
         password: payload.password,
         isHsuStudent: payload.isHsuStudent,
-        studentId: payload.isHsuStudent ? payload.studentId?.trim() || null : null,
+        isHsuStaff: payload.isHsuStaff,
+        studentId: payload.isHsuStudent ? payload.studentId?.trim().toUpperCase() || null : null,
         entranceYear: payload.isHsuStudent ? payload.entranceYear : null,
         programme: payload.isHsuStudent ? payload.programme?.trim() || null : null,
+        staffNumber: payload.isHsuStaff ? payload.staffNumber?.trim() || null : null,
         heardAbout: payload.heardAbout?.trim() || null,
       }),
       cache: "no-store",

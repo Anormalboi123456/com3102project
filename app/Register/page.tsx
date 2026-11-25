@@ -7,6 +7,7 @@ import "../../css/common.css"
 export default function Register() {
   const [message, setMessage] = useState("")
   const [isHsuStudent, setIsHsuStudent] = useState<"yes" | "no" | "">("")
+  const [isHsuStaff, setIsHsuStaff] = useState<"yes" | "no" | "">("")
   const [redirectSeconds, setRedirectSeconds] = useState<number | null>(null)
   const router = useRouter()
 
@@ -46,13 +47,33 @@ export default function Register() {
       return
     }
 
+    const studentId = String(formData.get("student_id") ?? "").trim().toUpperCase()
+    if (studentStatus === "yes" && !/^S\d{6}$/.test(studentId)) {
+      setMessage("Student number must be S followed by exactly 6 digits (for example, S123456).")
+      return
+    }
+
+    const staffStatus = formData.get("isHsuStaff")
+    if (staffStatus !== "yes" && staffStatus !== "no") {
+      setMessage("Choose whether you are a HSU staff member.")
+      return
+    }
+
+    const staffNumber = String(formData.get("staff_number") ?? "").trim()
+    if (staffStatus === "yes" && !staffNumber) {
+      setMessage("Enter your HSU staff number.")
+      return
+    }
+
     const payload = {
       username,
       password,
       isHsuStudent: studentStatus === "yes",
-      studentId: String(formData.get("student_id") ?? "") || null,
+      isHsuStaff: staffStatus === "yes",
+      studentId: studentStatus === "yes" ? studentId : null,
       entranceYear: String(formData.get("entrance_year") ?? "") || null,
       programme: String(formData.get("programme") ?? "") || null,
+      staffNumber: staffStatus === "yes" ? staffNumber : null,
       heardAbout: String(formData.get("heard_about") ?? "") || null,
     }
 
@@ -92,6 +113,7 @@ export default function Register() {
         onReset={() => {
           setMessage("")
           setIsHsuStudent("")
+          setIsHsuStaff("")
           setRedirectSeconds(null)
         }}
       >
@@ -142,6 +164,44 @@ export default function Register() {
             </label>
           </div>
         </fieldset>
+        <fieldset className="flex flex-col gap-2">
+          <legend>Are you a HSU Staff?</legend>
+          <div className="flex gap-4">
+            <label className="flex items-center gap-1">
+              <input
+                name="isHsuStaff"
+                type="radio"
+                value="yes"
+                required
+                checked={isHsuStaff === "yes"}
+                onChange={() => setIsHsuStaff("yes")}
+              />
+              Yes
+            </label>
+            <label className="flex items-center gap-1">
+              <input
+                name="isHsuStaff"
+                type="radio"
+                value="no"
+                checked={isHsuStaff === "no"}
+                onChange={() => setIsHsuStaff("no")}
+              />
+              No
+            </label>
+          </div>
+        </fieldset>
+
+        {isHsuStaff === "yes" && (
+          <label className="flex flex-col gap-1">
+            <span>Staff number</span>
+            <input
+              className="login-input slide-in"
+              name="staff_number"
+              type="text"
+              autoComplete="off"
+            />
+          </label>
+        )}
 
         {isHsuStudent === "yes" && (
           <>
@@ -151,6 +211,10 @@ export default function Register() {
                 className="login-input slide-in"
                 name="student_id"
                 type="text"
+                maxLength={7}
+                pattern="[sS][0-9]{6}"
+                title="Enter S followed by exactly 6 digits, for example S123456."
+                autoCapitalize="characters"
                 required
               />
             </label>

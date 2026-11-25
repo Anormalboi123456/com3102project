@@ -1,6 +1,14 @@
+import { cookies } from "next/headers";
+import {
+  createSessionToken,
+  SESSION_COOKIE_NAME,
+  SESSION_MAX_AGE_SECONDS,
+} from "@/lib/session";
+
 type LoginRequest = {
   username: string;
   password: string;
+  staffNumber: string | null;
 };
 
 function isLoginRequest(value: unknown): value is LoginRequest {
@@ -13,7 +21,9 @@ function isLoginRequest(value: unknown): value is LoginRequest {
     credentials.username.trim().length <= 80 &&
     typeof credentials.password === "string" &&
     credentials.password.length > 0 &&
-    credentials.password.length <= 4096
+    credentials.password.length <= 4096 &&
+    (credentials.staffNumber === null ||
+      (typeof credentials.staffNumber === "string" && credentials.staffNumber.length <= 32))
   );
 }
 
@@ -46,16 +56,69 @@ export async function POST(request: Request) {
       body: JSON.stringify({
         username: payload.username.trim(),
         password: payload.password,
+        staffNumber: payload.staffNumber?.trim() || null,
       }),
       cache: "no-store",
     });
 
     if (response.status === 200) {
+      let loginResult: unknown;
+      try {
+        loginResult = await response.json();
+      } catch {
+        console.error("PHP login API returned an invalid success response.");
+        return Response.json({ error: "Login service is unavailable." }, { status: 502 });
+      }
+
+      if (
+        typeof loginResult !== "object" ||
+        loginResult === null ||
+        !("success" in loginResult) ||
+        loginResult.success !== true ||
+        !("isHsuStaff" in loginResult) ||
+        typeof loginResult.isHsuStaff !== "boolean"
+      ) {
+        console.error("PHP login API did not return the account's staff status.");
+        return Response.json({ error: "Login service is unavailable." }, { status: 502 });
+      }
+
+      try {
+        const sessionToken = createSessionToken(
+          payload.username.trim(),
+          loginResult.isHsuStaff,
+        );
+        const cookieStore = await cookies();
+        cookieStore.set(SESSION_COOKIE_NAME, sessionToken, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "lax",
+          path: "/",
+          maxAge: SESSION_MAX_AGE_SECONDS,
+        });
+      } catch (error) {
+        console.error("Could not create the login session:", error);
+        return Response.json({ error: "Login service is not configured." }, { status: 500 });
+      }
+
       return Response.json({ success: true });
     }
 
     if (response.status === 401) {
       return Response.json({ error: "Incorrect username or password." }, { status: 401 });
+    }
+
+    if (response.status === 403) {
+      return Response.json(
+        { error: "This staff account is missing its staff number. Contact the administrator." },
+        { status: 403 },
+      );
+    }
+
+    if (response.status === 422) {
+      return Response.json(
+        { error: "Enter the staff number registered with this staff account." },
+        { status: 422 },
+      );
     }
 
     console.error(`PHP login API returned HTTP ${response.status}.`);
