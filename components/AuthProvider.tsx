@@ -69,33 +69,43 @@ export default function AuthProvider({
                 <h1 className="slide-in">Welcome to Hang Sheng University App!</h1>
               </td>
               <td className="login-cell">
-                {username ? (
-                  <span className="home-login-link slide-in">
-                    <Image
-                      src="/resources/user_icon.png"
-                      className="home-login-icon"
-                      alt=""
-                      width={512}
-                      height={512}
-                    />
-                    {username}
-                    <button className="ml-2 underline" type="button" onClick={logout}>
-                      Log out
-                    </button>
-                    {logoutError && <span role="alert">{logoutError}</span>}
-                  </span>
-                ) : (
-                  <Link className="home-login-link slide-in" href="/Login">
-                    <Image
-                      src="/resources/user_icon.png"
-                      className="home-login-icon"
-                      alt=""
-                      width={512}
-                      height={512}
-                    />
-                    Log in
-                  </Link>
-                )}
+                <div className="flex flex-wrap items-center justify-end gap-2">
+                  {isHsuStaff && (
+                    <Link
+                      className="slide-in inline-flex items-center rounded bg-green-600 px-2 py-1 text-xs font-semibold text-white"
+                      href="/Students"
+                    >
+                      Database
+                    </Link>
+                  )}
+                  {username ? (
+                    <span className="home-login-link slide-in">
+                      <Image
+                        src="/resources/user_icon.png"
+                        className="home-login-icon"
+                        alt=""
+                        width={512}
+                        height={512}
+                      />
+                      {username}
+                      <button className="ml-2 underline" type="button" onClick={logout}>
+                        Log out
+                      </button>
+                      {logoutError && <span role="alert">{logoutError}</span>}
+                    </span>
+                  ) : (
+                    <Link className="home-login-link slide-in" href="/Login">
+                      <Image
+                        src="/resources/user_icon.png"
+                        className="home-login-icon"
+                        alt=""
+                        width={512}
+                        height={512}
+                      />
+                      Log in
+                    </Link>
+                  )}
+                </div>
               </td>
             </tr>
           </tbody>
@@ -119,16 +129,6 @@ export default function AuthProvider({
                 >
                   About Us
                 </Link>
-              </td>
-              <td>
-                {isHsuStaff && (
-                  <Link
-                    className="slide-in block w-full rounded bg-green-600 px-4 py-2 text-center text-white"
-                    href="/Students"
-                  >
-                    User accounts
-                  </Link>
-                )}
               </td>
               <td>
                 <Link

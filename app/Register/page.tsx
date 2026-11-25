@@ -251,7 +251,7 @@ export default function Register() {
           <button className="rounded bg-blue-600 px-4 py-2 text-white" type="submit">
             Register
           </button>
-          <button className="rounded border border-blue-500 px-4 py-2" type="reset">
+          <button className="rounded border bg-blue-500 px-4 py-2" type="reset">
             Reset
           </button>
           <Link className="rounded bg-blue-600 px-4 py-2 text-white" href="/Login">

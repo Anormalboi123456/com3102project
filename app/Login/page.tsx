@@ -98,15 +98,8 @@ export default function Login() {
         <button className="rounded bg-blue-600 px-4 py-2 text-white" type="submit">
             Log in
         </button>
-        <button className="rounded border border-gray-500 px-4 py-2" type="reset">
+        <button className="rounded border bg-blue-500 px-4 py-2" type="reset">
             Reset
-        </button>
-        <button
-            className="rounded border border-gray-500 px-4 py-2"
-            type="button"
-            onClick={() => setMessage("Password recovery is not available yet.")}
-        >
-            Forgot password?
         </button>
         <Link className="rounded bg-blue-600 px-4 py-2 text-white" href='../Register'>
             Register

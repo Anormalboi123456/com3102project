@@ -74,18 +74,24 @@ export async function POST(request: Request) {
         typeof loginResult !== "object" ||
         loginResult === null ||
         !("success" in loginResult) ||
-        loginResult.success !== true ||
-        !("isHsuStaff" in loginResult) ||
-        typeof loginResult.isHsuStaff !== "boolean"
+        loginResult.success !== true
       ) {
-        console.error("PHP login API did not return the account's staff status.");
+        console.error("PHP login API returned an invalid success response.");
         return Response.json({ error: "Login service is unavailable." }, { status: 502 });
+      }
+
+      const isHsuStaff =
+        "isHsuStaff" in loginResult && typeof loginResult.isHsuStaff === "boolean"
+          ? loginResult.isHsuStaff
+          : false;
+      if (isHsuStaff === false && !("isHsuStaff" in loginResult)) {
+        console.warn("PHP login API omitted staff status; granting a non-staff session.");
       }
 
       try {
         const sessionToken = createSessionToken(
           payload.username.trim(),
-          loginResult.isHsuStaff,
+          isHsuStaff,
         );
         const cookieStore = await cookies();
         cookieStore.set(SESSION_COOKIE_NAME, sessionToken, {
