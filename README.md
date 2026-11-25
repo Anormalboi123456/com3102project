@@ -13,13 +13,12 @@ Registered accounts are stored in the `user_accounts` table. PHP endpoints conne
    GRANT SELECT, INSERT ON hsu_student_app.user_accounts TO 'hsu_app'@'127.0.0.1';
    ```
 
-4. Copy [`php-api/user_accounts.php`](./php-api/user_accounts.php), [`php-api/login.php`](./php-api/login.php), and [`php-api/register.php`](./php-api/register.php) to a directory served by XAMPP Apache, for example:
+4. Copy [`php-api/user_accounts.php`](./php-api/user_accounts.php), [`php-api/login.php`](./php-api/login.php), and [`php-api/register.php`](./php-api/register.php) to a directory served by XAMPP Apache.
 
    ```text
    /Applications/XAMPP/xamppfiles/htdocs/com3102project-api/
    ```
 
-   The PHP installation used by XAMPP must have the PDO MySQL extension enabled. The database user needs `SELECT` permission for the accounts and login endpoints, and `INSERT` permission for registration.
 5. In XAMPP Control Panel, open **Apache > Config > httpd.conf** and add these `SetEnv` directives to its server configuration, using your own database password and the same API token you will configure for Next.js:
 
    ```apache
@@ -31,8 +30,8 @@ Registered accounts are stored in the `user_accounts` table. PHP endpoints conne
    SetEnv STUDENTS_API_TOKEN "123456"
    ```
 
-   Restart Apache after changing its configuration. Keep these values private and out of source control.       The `STUDENTS_API_TOKEN` protects the PHP endpoints; it is not user login.
-6. Add the PHP endpoint URL and the matching API token to `.env.local` in the project root:
+   Restart Apache after changing its configuration.
+6. Create a file named .env.local.
 ## 123456 is a test example, change to anything else later:
 
    ```dotenv
@@ -40,14 +39,16 @@ Registered accounts are stored in the `user_accounts` table. PHP endpoints conne
    PHP_LOGIN_API_URL=http://localhost/com3102project-api/login.php
    PHP_REGISTER_API_URL=http://localhost/com3102project-api/register.php
    STUDENTS_API_TOKEN=123456
-   SESSION_SECRET=replace-with-at-least-32-random-bytes
+   SESSION_SECRET=kzKEP51kF4U2tcpbs2zlz8YJQrFDF_3shxBhyWQJ3RY
    ```
 
-   Generate a private session secret (for example, with `openssl rand -base64 32`) and put its output in `SESSION_SECRET`. Keep it only in `.env.local`; restart Next.js after changing the file.
+   Randomly generate a private session secret by yourself, you can use the ones I generated as an example.
 
 7. Run `npm run dev`, then register at [http://localhost:3000/Register](http://localhost:3000/Register) and log in. Open [http://localhost:3000/Students](http://localhost:3000/Students) to view registered user accounts.
 
 8. To access the database with view of account list, register a staff account in register, click "YES" on radio button of staff and make up a staff number, public can also create a accoutn to view activities.
+
+9. You can go to [localhost/myphpadmin] for altering the SQL.
 
 To access the app from another computer, the Next.js server must be able to reach the PHP API, and PHP/Apache must be able to reach the database. For a public deployment, host the PHP API and database securely; do not expose XAMPP's database port directly to the internet.
 
