@@ -6,21 +6,42 @@ import Link from "next/link"
 export default function Login() {
     const [message, setMessage] = useState("")
 
-    function handleSubmit(event: FormEvent<HTMLFormElement>) {
-        event.preventDefault()
+   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  event.preventDefault()
 
-        const formData = new FormData(event.currentTarget)
-        const username = String(formData.get("username") ?? "").trim()
-        const password = String(formData.get("password") ?? "")
+  const formData = new FormData(event.currentTarget)
+  const username = String(formData.get("username") ?? "").trim()
+  const password = String(formData.get("password") ?? "")
 
-        if (!username || !password) {
-            setMessage("Please enter your username and password.")
-            return
-        }
+  if (!username || !password) {
+    setMessage("Please enter your username and password.")
+    return
+  }
 
-        setMessage(`Login form received for ${username}`)
+  setMessage("Checking...")
+
+  try {
+    const response = await fetch("/api/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password }),
+    })
+
+    if (response.status === 401) {
+      setMessage("Incorrect username or password.")
+      return
     }
 
+    if (!response.ok) {
+      setMessage(`Login failed (HTTP ${response.status}). Please try again.`)
+      return
+    }
+
+    setMessage("Login successful.")
+  } catch {
+    setMessage("Could not connect to the login service. Please try again.")
+  }
+}
     return(
         //header
     <div className="login-page">
