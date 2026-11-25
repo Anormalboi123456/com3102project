@@ -47,6 +47,7 @@ Registered accounts are stored in the `user_accounts` table. PHP endpoints conne
 
 7. Run `npm run dev`, then register at [http://localhost:3000/Register](http://localhost:3000/Register) and log in. Open [http://localhost:3000/Students](http://localhost:3000/Students) to view registered user accounts.
 
+8. To access the database with view of account list, register a staff account in register, click "YES" on radio button of staff and make up a staff number, public can also create a accoutn to view activities.
 
 To access the app from another computer, the Next.js server must be able to reach the PHP API, and PHP/Apache must be able to reach the database. For a public deployment, host the PHP API and database securely; do not expose XAMPP's database port directly to the internet.
 
