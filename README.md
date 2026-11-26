@@ -10,7 +10,7 @@ Registered accounts are stored in the `user_accounts` table. PHP endpoints conne
 
    ```sql
    CREATE USER 'hsu_admin'@'127.0.0.1' IDENTIFIED BY 'admin123';
-   GRANT SELECT, INSERT ON hsu_student_app.user_accounts TO 'hsu_app'@'127.0.0.1';
+   GRANT SELECT, INSERT ON hsu_student_app.user_accounts TO 'hsu_admin'@'127.0.0.1';
    ```
 
 4. Copy [`php-api/user_accounts.php`](./php-api/user_accounts.php), [`php-api/login.php`](./php-api/login.php), and [`php-api/register.php`](./php-api/register.php) to a directory served by XAMPP Apache.

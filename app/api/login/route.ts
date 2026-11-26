@@ -89,7 +89,7 @@ export async function POST(request: Request) {
         console.error("PHP login API returned an invalid success response.");
         return Response.json({ error: "Login service is unavailable." }, { status: 502 });
       }
-
+{/*Get the user is staff or not */}
       const isHsuStaff = getStaffStatus(loginResult);
       if (isHsuStaff === null) {
         console.error("PHP login API omitted or returned an invalid staff status.");
@@ -101,7 +101,7 @@ export async function POST(request: Request) {
           { status: 502 },
         );
       }
-
+{/*Write an isHsuStudent later for student only port*/}
       try {
         const sessionToken = createSessionToken(
           payload.username.trim(),
