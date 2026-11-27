@@ -120,17 +120,17 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
                   <td>
                     <Link
                       className="slide-in block w-full rounded bg-green-600 px-4 py-2 text-center text-white"
-                      href="/About"
+                      href="/Activities"
                     >
-                      Test
+                      Activities
                     </Link>
                   </td>
                   <td>
                     <Link
                       className="slide-in block w-full rounded bg-green-600 px-4 py-2 text-center text-white"
-                      href="/About"
+                      href="/Calendar"
                     >
-                      Test
+                      Calendar
                     </Link>
                   </td>
                 </tr>
