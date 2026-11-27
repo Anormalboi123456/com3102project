@@ -320,3 +320,426 @@ body {
     }
 }
 /* End of Homepage */
+
+/* ============================================================
+   CALENDAR & ACTIVITIES MODULE STYLES
+   ============================================================ */
+
+.section-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.section-header-row h2 {
+    margin: 0;
+}
+
+.section-link {
+    color: #15803d;
+    font-weight: bolder;
+    font-size: 14px;
+    text-decoration: underline;
+}
+
+.role-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    background-color: #ecfdf5;
+    border: 1px solid #16a34a;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+    font-size: 14px;
+}
+
+.role-badge {
+    display: inline-block;
+    padding: 0.2rem 0.65rem;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: bolder;
+    border: 1px solid currentColor;
+}
+
+.role-badge-staff {
+    background-color: #dcfce7;
+    color: #166534;
+}
+
+.role-badge-student {
+    background-color: #dbeafe;
+    color: #1e40af;
+}
+
+.role-badge-public {
+    background-color: #fef3c7;
+    color: #92400e;
+}
+
+.alert-banner {
+    background-color: #fef2f2;
+    border: 1px solid #dc2626;
+    border-radius: 8px;
+    padding: 0.85rem 1rem;
+    margin-bottom: 1rem;
+}
+
+.alert-banner h3 {
+    margin: 0 0 0.5rem 0;
+    color: #991b1b;
+    font-size: 17px;
+}
+
+.alert-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.35rem 0;
+    border-top: 1px solid #fecaca;
+    font-size: 14px;
+    flex-wrap: wrap;
+}
+
+.alert-item:first-of-type {
+    border-top: 0;
+}
+
+.countdown-chip {
+    display: inline-block;
+    padding: 0.15rem 0.55rem;
+    border-radius: 999px;
+    background-color: #dc2626;
+    color: white;
+    font-size: 12px;
+    font-weight: bolder;
+}
+
+.cal-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.cal-nav-group {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.btn-secondary {
+    display: inline-block;
+    padding: 0.45rem 0.9rem;
+    font-size: 14px;
+    font-weight: bolder;
+    background-color: #f6f1e7;
+    color: #111;
+    border: 1px solid #111;
+    border-radius: 6px;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.btn-secondary:hover {
+    background-color: #e7decb;
+}
+
+.btn-secondary.active-tab {
+    background-color: #16a34a;
+    color: #fff;
+    border-color: #15803d;
+}
+
+.btn-danger {
+    display: inline-block;
+    padding: 0.35rem 0.75rem;
+    font-size: 13px;
+    font-weight: bolder;
+    background-color: #dc2626;
+    color: white;
+    border: 0;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.btn-danger:hover {
+    background-color: #b91c1c;
+}
+
+.btn-small {
+    padding: 0.35rem 0.75rem;
+    font-size: 13px;
+    margin-top: 0;
+}
+
+.cal-grid-table {
+    table-layout: fixed;
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fff;
+}
+
+.cal-grid-table th {
+    background-color: green;
+    color: white;
+    padding: 0.5rem 0.25rem;
+    border: 1px solid black;
+    font-size: 14px;
+}
+
+.cal-grid-table td {
+    border: 1px solid #999;
+    height: 76px;
+    vertical-align: top;
+    padding: 0.3rem;
+    cursor: pointer;
+    transition: background-color 120ms ease;
+}
+
+.cal-grid-table td:hover {
+    background-color: #f0fdf4;
+}
+
+.cal-cell-empty {
+    background-color: #f9fafb;
+    cursor: default !important;
+}
+
+.cal-cell-today {
+    background-color: #fff3c4;
+    outline: 2px solid #16a34a;
+    outline-offset: -2px;
+}
+
+.cal-cell-selected {
+    background-color: #dcfce7 !important;
+    outline: 2px solid #15803d;
+    outline-offset: -2px;
+}
+
+.cal-day-num {
+    font-weight: bolder;
+    font-size: 14px;
+    margin-bottom: 0.25rem;
+}
+
+.cal-dots-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3px;
+}
+
+.cal-dot-tag {
+    display: inline-block;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+}
+
+.dot-assignment { background-color: #dc2626; }
+.dot-test { background-color: #ea580c; }
+.dot-exam { background-color: #9333ea; }
+.dot-event { background-color: #16a34a; }
+.dot-holiday { background-color: #0284c7; }
+.dot-personal { background-color: #4b5563; }
+.dot-activity { background-color: #ca8a04; }
+
+.legend-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 0.6rem;
+    font-size: 13px;
+    color: #333;
+}
+
+.legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    align-items: center;
+    margin-bottom: 0.85rem;
+}
+
+.filter-select {
+    padding: 0.45rem 0.65rem;
+    font-size: 14px;
+    border: 1px solid #111;
+    border-radius: 6px;
+    background-color: #fff;
+    color: #000;
+}
+
+.filter-search {
+    flex: 1;
+    min-width: 180px;
+    padding: 0.45rem 0.7rem;
+    font-size: 14px;
+    border: 1px solid #111;
+    border-radius: 6px;
+    background-color: #fff;
+    color: #000;
+}
+
+.event-list-card {
+    border: 1px solid #ccc;
+    border-left: 5px solid #16a34a;
+    border-radius: 6px;
+    padding: 0.75rem;
+    margin-bottom: 0.65rem;
+    background-color: #fff;
+}
+
+.event-list-card.type-Assignment { border-left-color: #dc2626; }
+.event-list-card.type-Test { border-left-color: #ea580c; }
+.event-list-card.type-Exam { border-left-color: #9333ea; }
+.event-list-card.type-Holiday { border-left-color: #0284c7; }
+.event-list-card.type-Personal { border-left-color: #4b5563; }
+.event-list-card.type-Activity { border-left-color: #ca8a04; background-color: #fefce8; }
+
+.pill-tag {
+    display: inline-block;
+    padding: 0.12rem 0.55rem;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: bolder;
+    border: 1px solid #16a34a;
+    background-color: #dcfce7;
+    color: #14532d;
+}
+
+.pill-warn {
+    background-color: #fef3c7;
+    border-color: #d97706;
+    color: #92400e;
+}
+
+.pill-danger {
+    background-color: #fee2e2;
+    border-color: #dc2626;
+    color: #991b1b;
+}
+
+.pill-info {
+    background-color: #e0f2fe;
+    border-color: #0284c7;
+    color: #075985;
+}
+
+.pill-purple {
+    background-color: #f3e8ff;
+    border-color: #9333ea;
+    color: #581c87;
+}
+
+.form-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+}
+
+.activities-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+    gap: 1rem;
+}
+
+.activity-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: #fff;
+    border: 1px solid #111;
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.capacity-bar-bg {
+    width: 100%;
+    height: 8px;
+    background-color: #e5e7eb;
+    border-radius: 999px;
+    overflow: hidden;
+    margin: 0.35rem 0;
+}
+
+.capacity-bar-fill {
+    height: 100%;
+    background-color: #16a34a;
+    border-radius: 999px;
+}
+
+.capacity-bar-fill.near-full {
+    background-color: #d97706;
+}
+
+.capacity-bar-fill.is-full {
+    background-color: #dc2626;
+}
+
+.conflict-box {
+    background-color: #fffbeb;
+    border: 1px solid #d97706;
+    color: #92400e;
+    border-radius: 6px;
+    padding: 0.5rem 0.65rem;
+    font-size: 13px;
+    margin: 0.5rem 0;
+}
+
+.status-error {
+    background-color: #fef2f2;
+    border: 1px solid #dc2626;
+    color: #991b1b;
+    padding: 0.75rem;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+    font-weight: bolder;
+}
+
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    z-index: 50;
+}
+
+.modal-panel {
+    background-color: #fff;
+    border: 2px solid #111;
+    border-radius: 10px;
+    max-width: 680px;
+    width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+    padding: 1.25rem;
+}
+
+@media (max-width: 700px) {
+    .form-grid-2 {
+        grid-template-columns: 1fr;
+    }
+    .cal-grid-table td {
+        height: 56px;
+    }
+}
