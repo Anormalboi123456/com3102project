@@ -112,7 +112,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
                   </td>
                   <td>
                     <Link
-                      className="slide-in block w-full rounded bg-green-600 px-2 py-1 text-center text-sm text-white"
+                      className="slide-in block w-full rounded bg-green-600 px-4 py-2 text-center text-white"
                       href="/Admin"
                     >
                       Admin

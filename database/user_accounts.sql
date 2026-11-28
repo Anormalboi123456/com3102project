@@ -26,6 +26,7 @@ INSERT INTO user_accounts (
   username, password_hash, is_hsu_student, is_hsu_staff,
   student_id, staff_number, entrance_year, programme, heard_about
 )
+-- the password_hash IS "password", somehow it is encrypted, wow gemini! 
 SELECT * FROM (
   SELECT
     'hsu_staff' AS username,
