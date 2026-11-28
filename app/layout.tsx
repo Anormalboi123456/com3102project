@@ -134,6 +134,14 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
                       Calendar
                     </Link>
                   </td>
+                  <td>
+                    <Link
+                      className="slide-in block w-full rounded bg-green-600 px-4 py-2 text-center text-white"
+                      href="/Grades"
+                    >
+                      Grades
+                    </Link>
+                  </td>
                 </tr>
               </tbody>
             </table>
