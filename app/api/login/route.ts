@@ -27,9 +27,9 @@ function isLoginRequest(value: unknown): value is LoginRequest {
   );
 }
 
-function getStaffStatus(value: object): boolean | null {
+function getBooleanFlag(value: object, camelKey: string, snakeKey: string): boolean | null {
   const result = value as Record<string, unknown>;
-  const status = result.isHsuStaff ?? result.is_hsu_staff;
+  const status = result[camelKey] ?? result[snakeKey];
 
   if (typeof status === "boolean") return status;
   if (status === 1 || status === "1") return true;
@@ -89,8 +89,7 @@ export async function POST(request: Request) {
         console.error("PHP login API returned an invalid success response.");
         return Response.json({ error: "Login service is unavailable." }, { status: 502 });
       }
-{/*Get the user is staff or not */}
-      const isHsuStaff = getStaffStatus(loginResult);
+const isHsuStaff = getBooleanFlag(loginResult, "isHsuStaff", "is_hsu_staff");
       if (isHsuStaff === null) {
         console.error("PHP login API omitted or returned an invalid staff status.");
         return Response.json(
@@ -101,11 +100,16 @@ export async function POST(request: Request) {
           { status: 502 },
         );
       }
-{/*Write an isHsuStudent later for student only port*/}
+
+      // Older PHP endpoints may not return student status; default to false.
+      const isHsuStudent =
+        getBooleanFlag(loginResult, "isHsuStudent", "is_hsu_student") ?? false;
+
       try {
         const sessionToken = createSessionToken(
           payload.username.trim(),
           isHsuStaff,
+          isHsuStudent,
         );
         const cookieStore = await cookies();
         cookieStore.set(SESSION_COOKIE_NAME, sessionToken, {

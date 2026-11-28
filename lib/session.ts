@@ -6,7 +6,23 @@ export const SESSION_MAX_AGE_SECONDS = 60 * 60 * 8;
 export type Session = {
   username: string;
   isHsuStaff: boolean;
+  isHsuStudent: boolean;
 };
+
+export type UserRole = "Staff" | "Student" | "Public";
+
+/** Priority: Staff > Student > Public */
+export function roleFromFlags(isHsuStaff: boolean, isHsuStudent: boolean): UserRole {
+  if (isHsuStaff) return "Staff";
+  if (isHsuStudent) return "Student";
+  return "Public";
+}
+
+/** Resolve role from a verified session (or Public when not logged in). */
+export function getUserRole(session: Session | null): UserRole {
+  if (!session) return "Public";
+  return roleFromFlags(session.isHsuStaff, session.isHsuStudent);
+}
 
 function getSessionSecret() {
   const secret = process.env.SESSION_SECRET;
@@ -20,11 +36,16 @@ function sign(payload: string) {
   return createHmac("sha256", getSessionSecret()).update(payload).digest("base64url");
 }
 
-export function createSessionToken(username: string, isHsuStaff: boolean) {
+export function createSessionToken(
+  username: string,
+  isHsuStaff: boolean,
+  isHsuStudent: boolean,
+) {
   const payload = Buffer.from(
     JSON.stringify({
       username,
       isHsuStaff,
+      isHsuStudent,
       expiresAt: Date.now() + SESSION_MAX_AGE_SECONDS * 1000,
     }),
   ).toString("base64url");
@@ -54,12 +75,14 @@ export function verifySessionToken(token: string | undefined): Session | null {
     const session = parsed as {
       username?: unknown;
       isHsuStaff?: unknown;
+      isHsuStudent?: unknown;
       expiresAt?: unknown;
     };
     if (
       typeof session.username !== "string" ||
       session.username.length === 0 ||
       typeof session.isHsuStaff !== "boolean" ||
+      typeof session.isHsuStudent !== "boolean" ||
       typeof session.expiresAt !== "number" ||
       !Number.isFinite(session.expiresAt) ||
       session.expiresAt <= Date.now()
@@ -67,7 +90,11 @@ export function verifySessionToken(token: string | undefined): Session | null {
       return null;
     }
 
-    return { username: session.username, isHsuStaff: session.isHsuStaff };
+    return {
+      username: session.username,
+      isHsuStaff: session.isHsuStaff,
+      isHsuStudent: session.isHsuStudent,
+    };
   } catch {
     return null;
   }

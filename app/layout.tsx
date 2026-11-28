@@ -43,6 +43,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
           key={session?.username ?? "guest"}
           username={session?.username ?? null}
           isHsuStaff={session?.isHsuStaff ?? false}
+          isHsuStudent={session?.isHsuStudent ?? false}
         >
           <div className="login-page">
             <table className="menutable">
@@ -112,9 +113,9 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
                   <td>
                     <Link
                       className="slide-in block w-full rounded bg-green-600 px-2 py-1 text-center text-sm text-white"
-                      href="/Students"
+                      href="/Admin"
                     >
-                      Database
+                      Admin
                     </Link>
                   </td>
                   <td>

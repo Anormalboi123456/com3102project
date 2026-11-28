@@ -1,133 +1,101 @@
-<?php
+import { createHmac, timingSafeEqual } from "node:crypto";
 
-function respondJson($status, $body)
-{
-    http_response_code($status);
-    header('Content-Type: application/json; charset=utf-8');
-    echo json_encode($body);
+export const SESSION_COOKIE_NAME = "hsu_session";
+export const SESSION_MAX_AGE_SECONDS = 60 * 60 * 8;
+
+export type Session = {
+  username: string;
+  isHsuStaff: boolean;
+  isHsuStudent: boolean;
+};
+
+export type UserRole = "Staff" | "Student" | "Public";
+
+/** Priority: Staff > Student > Public */
+export function roleFromFlags(isHsuStaff: boolean, isHsuStudent: boolean): UserRole {
+  if (isHsuStaff) return "Staff";
+  if (isHsuStudent) return "Student";
+  return "Public";
 }
 
-function requiredEnvironmentVariable($name)
-{
-    $value = getenv($name);
-    if ($value === false || $value === '') {
-        throw new RuntimeException($name . ' is not configured.');
-    }
-
-    return $value;
+/** Resolve role from a verified session (or Public when not logged in). */
+export function getUserRole(session: Session | null): UserRole {
+  if (!session) return "Public";
+  return roleFromFlags(session.isHsuStaff, session.isHsuStudent);
 }
 
-if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
-    header('Allow: POST');
-    respondJson(405, ['error' => 'Method not allowed.']);
-    exit;
+function getSessionSecret() {
+  const secret = process.env.SESSION_SECRET;
+  if (!secret || Buffer.byteLength(secret) < 32) {
+    throw new Error("SESSION_SECRET must be configured with at least 32 bytes.");
+  }
+  return secret;
 }
 
-$apiToken = getenv('STUDENTS_API_TOKEN');
-$authorization = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
-if ($authorization === '' && function_exists('getallheaders')) {
-    foreach (getallheaders() as $name => $value) {
-        if (strcasecmp($name, 'Authorization') === 0) {
-            $authorization = $value;
-            break;
-        }
-    }
+function sign(payload: string) {
+  return createHmac("sha256", getSessionSecret()).update(payload).digest("base64url");
 }
 
-if (
-    $apiToken === false
-    || $apiToken === ''
-    || !preg_match('/^Bearer\s+(.+)$/i', $authorization, $matches)
-    || !hash_equals($apiToken, trim($matches[1]))
+export function createSessionToken(
+  username: string,
+  isHsuStaff: boolean,
+  isHsuStudent: boolean,
 ) {
-    respondJson(403, ['error' => 'Unauthorized.']);
-    exit;
+  const payload = Buffer.from(
+    JSON.stringify({
+      username,
+      isHsuStaff,
+      isHsuStudent,
+      expiresAt: Date.now() + SESSION_MAX_AGE_SECONDS * 1000,
+    }),
+  ).toString("base64url");
+
+  return `${payload}.${sign(payload)}`;
 }
 
-$payload = json_decode(file_get_contents('php://input'), true);
-$username = is_array($payload) && isset($payload['username']) && is_string($payload['username'])
-    ? trim($payload['username'])
-    : '';
-$password = is_array($payload) && isset($payload['password']) && is_string($payload['password'])
-    ? $payload['password']
-    : '';
-$staffNumber = is_array($payload) && isset($payload['staffNumber']) && is_string($payload['staffNumber'])
-    ? trim($payload['staffNumber'])
-    : '';
+export function verifySessionToken(token: string | undefined): Session | null {
+  if (!token) return null;
 
-if (
-    $username === ''
-    || strlen($username) > 80
-    || $password === ''
-    || strlen($password) > 4096
-    || strlen($staffNumber) > 32
-) {
-    respondJson(400, ['error' => 'Username and password are required.']);
-    exit;
-}
+  const [payload, signature, extra] = token.split(".");
+  if (!payload || !signature || extra !== undefined) return null;
 
-try {
-    $host = requiredEnvironmentVariable('DB_HOST');
-    $database = requiredEnvironmentVariable('DB_NAME');
-    $user = requiredEnvironmentVariable('DB_USER');
-    $databasePassword = getenv('DB_PASSWORD');
-    $databasePassword = $databasePassword === false ? '' : $databasePassword;
+  const expectedSignature = Buffer.from(sign(payload));
+  const actualSignature = Buffer.from(signature);
+  if (
+    expectedSignature.length !== actualSignature.length ||
+    !timingSafeEqual(expectedSignature, actualSignature)
+  ) {
+    return null;
+  }
 
-    $rawPort = getenv('DB_PORT');
-    $port = $rawPort === false || $rawPort === ''
-        ? 3306
-        : filter_var($rawPort, FILTER_VALIDATE_INT);
-    if ($port === false || $port < 1 || $port > 65535) {
-        throw new RuntimeException('DB_PORT must be a valid TCP port number.');
+  try {
+    const parsed: unknown = JSON.parse(Buffer.from(payload, "base64url").toString("utf8"));
+    if (typeof parsed !== "object" || parsed === null) return null;
+
+    const session = parsed as {
+      username?: unknown;
+      isHsuStaff?: unknown;
+      isHsuStudent?: unknown;
+      expiresAt?: unknown;
+    };
+    if (
+      typeof session.username !== "string" ||
+      session.username.length === 0 ||
+      typeof session.isHsuStaff !== "boolean" ||
+      typeof session.isHsuStudent !== "boolean" ||
+      typeof session.expiresAt !== "number" ||
+      !Number.isFinite(session.expiresAt) ||
+      session.expiresAt <= Date.now()
+    ) {
+      return null;
     }
 
-    $pdo = new PDO(
-        'mysql:host=' . $host . ';port=' . $port . ';dbname=' . $database . ';charset=utf8mb4',
-        $user,
-        $databasePassword,
-        [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-            PDO::ATTR_EMULATE_PREPARES => false,
-        ]
-    );
-    $statement = $pdo->prepare(
-        'SELECT password_hash, is_hsu_staff, staff_number
-         FROM user_accounts WHERE username = :username LIMIT 1'
-    );
-    $statement->execute(['username' => $username]);
-    $account = $statement->fetch();
-} catch (RuntimeException $error) {
-    error_log($error->getMessage());
-    respondJson(500, ['error' => 'Login service is not configured.']);
-    exit;
-} catch (PDOException $error) {
-    error_log('Failed to check login credentials: ' . $error->getMessage());
-    respondJson(503, ['error' => 'Login service is unavailable.']);
-    exit;
+    return {
+      username: session.username,
+      isHsuStaff: session.isHsuStaff,
+      isHsuStudent: session.isHsuStudent,
+    };
+  } catch {
+    return null;
+  }
 }
-
-if (!$account || !password_verify($password, $account['password_hash'])) {
-    respondJson(401, ['error' => 'Incorrect username or password.']);
-    exit;
-}
-
-if ((bool) $account['is_hsu_staff'] && trim((string) $account['staff_number']) === '') {
-    respondJson(403, ['error' => 'Staff account is missing its staff number. Contact the administrator.']);
-    exit;
-}
-
-if ((bool) $account['is_hsu_staff'] && $staffNumber === '') {
-    respondJson(422, ['error' => 'Staff number is required for HSU staff login.']);
-    exit;
-}
-
-if ((bool) $account['is_hsu_staff'] && !hash_equals((string) $account['staff_number'], $staffNumber)) {
-    respondJson(401, ['error' => 'Incorrect username, password, or staff number.']);
-    exit;
-}
-
-respondJson(200, [
-    'success' => true,
-    'isHsuStaff' => (bool) $account['is_hsu_staff'],
-]);
