@@ -1,4 +1,10 @@
 <?php
+putenv('DB_HOST=127.0.0.1');
+putenv('DB_PORT=3306');
+putenv('DB_USER=hsu_admin');
+putenv('DB_PASSWORD=admin123');
+putenv('DB_NAME=hsu_student_app');
+putenv('STUDENTS_API_TOKEN=123456');
 
 function respondJson($status, $body)
 {
